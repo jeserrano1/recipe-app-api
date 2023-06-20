@@ -1,0 +1,21 @@
+---
+name: Checks
+
+on: [push] # CADA VEZ QUE HAGAMOS UN PUSH EN GIT
+
+jobs:
+  test-lint:
+    name: Test and List
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Login to Docker Hub # LOGIN IN THE DOCKER HUB
+        users: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Checkout  # GITHUB CHECKS OUR CODE
+        user: actions/checkout@v2
+      - name: Test # RUN TEST
+        run: docker-compose run --rm app sh -c "python manage.py test"
+      - name: Lint # RUN LINTING
+        run: docker-compose run --rm app sh -c "flake8"
