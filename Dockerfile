@@ -10,13 +10,21 @@ WORKDIR /app
 EXPOSE 8000
 
 ARG DEV=false
+# apk add --update --no-cache postgresql-client && - INSTALL POSTGRESQL-CLIENT PACKAGE INSIDE OUR IMAGE TO CONNECT PYSCOPG2 WITH POSTGRESQL
+# apk add --update --no-cache --virtual .tmp-build-deps - SETS A VIRTUAL DEPENDENCY PACKAGE TO REMOVE THEM LATER ON  
+# build-base postgresql-dev musl-dev && - INSTALL THOSE PACKAGES
+# apk del .tmp-build-deps = DELETE THOSE PACKAGES
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
+    apk add --update --no-cache postgresql-client && \ 
+    apk add --update --no-cache --virtual .tmp-build-deps \ 
+        build-base postgresql-dev musl-dev && \
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ $DEV = "true" ]; \
         then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
     fi && \
     rm -rf /tmp && \
+    apk del .tmp-build-deps && \
     adduser \
         --disabled-password \
         --no-create-home \
